@@ -23,103 +23,100 @@ import com.kk.taurus.playerbase.player.SysMediaPlayer;
 
 /**
  * Created by Taurus on 2018/3/17.
- *
+ * <p>
  * The configuration of the player is used for
  * the management of the decoder scheme.
  * You can add more than one decoding scheme.
- *
  */
 
 public class PlayerConfig {
 
-    public static final int DEFAULT_PLAN_ID = 0;
+  public static final int DEFAULT_PLAN_ID = 0;
+  //decoder plans arrays.
+  private static final SparseArrayCompat<DecoderPlan> mPlans;
+  //default decoder plan id is use System MediaPlayer.
+  private static int defaultPlanId = DEFAULT_PLAN_ID;
+  //Whether or not use the default NetworkEventProducer.
+  //default state false.
+  private static boolean useDefaultNetworkEventProducer = false;
 
-    //default decoder plan id is use System MediaPlayer.
-    private static int defaultPlanId = DEFAULT_PLAN_ID;
+  private static boolean playRecordState = false;
 
-    //decoder plans arrays.
-    private static SparseArrayCompat<DecoderPlan> mPlans;
+  private static int timerCounterInterval = 1000;
 
-    //Whether or not use the default NetworkEventProducer.
-    //default state false.
-    private static boolean useDefaultNetworkEventProducer = false;
+  static {
+    mPlans = new SparseArrayCompat<>(2);
 
-    private static boolean playRecordState = false;
+    //add default plan
+    DecoderPlan defaultPlan = new DecoderPlan(DEFAULT_PLAN_ID, SysMediaPlayer.class.getName(), "MediaPlayer");
+    addDecoderPlan(defaultPlan);
+    //set default plan id
+    setDefaultPlanId(DEFAULT_PLAN_ID);
+  }
 
-    private static int timerCounterInterval = 1000;
+  public static void addDecoderPlan(DecoderPlan plan) {
+    mPlans.put(plan.getIdNumber(), plan);
+  }
 
-    static {
-        mPlans = new SparseArrayCompat<>(2);
+  /**
+   * get current DecoderPlanId.
+   *
+   * @return
+   */
+  public static int getDefaultPlanId() {
+    return defaultPlanId;
+  }
 
-        //add default plan
-        DecoderPlan defaultPlan = new DecoderPlan(DEFAULT_PLAN_ID, SysMediaPlayer.class.getName(),"MediaPlayer");
-        addDecoderPlan(defaultPlan);
-        //set default plan id
-        setDefaultPlanId(DEFAULT_PLAN_ID);
-    }
+  /**
+   * setting default DecoderPlanId.
+   *
+   * @param planId
+   */
+  public static void setDefaultPlanId(int planId) {
+    defaultPlanId = planId;
+  }
 
-    public static void addDecoderPlan(DecoderPlan plan){
-        mPlans.put(plan.getIdNumber(), plan);
-    }
+  public static DecoderPlan getDefaultPlan() {
+    return getPlan(defaultPlanId);
+  }
 
-    /**
-     * setting default DecoderPlanId.
-     * @param planId
-     */
-    public static void setDefaultPlanId(int planId){
-        defaultPlanId = planId;
-    }
+  public static DecoderPlan getPlan(int planId) {
+    return mPlans.get(planId);
+  }
 
-    /**
-     * get current DecoderPlanId.
-     * @return
-     */
-    public static int getDefaultPlanId(){
-        return defaultPlanId;
-    }
+  /**
+   * Judging the legality of planId.
+   *
+   * @param planId
+   * @return
+   */
+  public static boolean isLegalPlanId(int planId) {
+    DecoderPlan plan = getPlan(planId);
+    return plan != null;
+  }
 
-    public static DecoderPlan getDefaultPlan(){
-        return getPlan(defaultPlanId);
-    }
+  public static boolean isUseDefaultNetworkEventProducer() {
+    return useDefaultNetworkEventProducer;
+  }
 
-    public static DecoderPlan getPlan(int planId){
-        return mPlans.get(planId);
-    }
+  //if you want to use default NetworkEventProducer, set it true.
+  public static void setUseDefaultNetworkEventProducer(boolean useDefaultNetworkEventProducer) {
+    PlayerConfig.useDefaultNetworkEventProducer = useDefaultNetworkEventProducer;
+  }
 
-    /**
-     * Judging the legality of planId.
-     * @param planId
-     * @return
-     */
-    public static boolean isLegalPlanId(int planId){
-        DecoderPlan plan = getPlan(planId);
-        return plan!=null;
-    }
+  public static void playRecord(boolean open) {
+    playRecordState = open;
+  }
 
-    //if you want to use default NetworkEventProducer, set it true.
-    public static void setUseDefaultNetworkEventProducer(boolean useDefaultNetworkEventProducer) {
-        PlayerConfig.useDefaultNetworkEventProducer = useDefaultNetworkEventProducer;
-    }
+  public static boolean isPlayRecordOpen() {
+    return playRecordState;
+  }
 
-    public static boolean isUseDefaultNetworkEventProducer() {
-        return useDefaultNetworkEventProducer;
-    }
+  public static int getTimerCounterInterval() {
+    return timerCounterInterval;
+  }
 
-    public static void playRecord(boolean open){
-        playRecordState = open;
-    }
-
-    public static boolean isPlayRecordOpen(){
-        return playRecordState;
-    }
-
-    public static int getTimerCounterInterval() {
-        if(timerCounterInterval <= 50)
-            timerCounterInterval = 50;
-        return timerCounterInterval;
-    }
-
-    public static void setTimerCounterInterval(int timerCounterInterval) {
-        PlayerConfig.timerCounterInterval = timerCounterInterval;
-    }
+  public static void setTimerCounterInterval(int timerCounterInterval) {
+    PlayerConfig.timerCounterInterval = timerCounterInterval;
+  }
 }
